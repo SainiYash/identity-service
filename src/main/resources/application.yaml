@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: identity-access-management-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/authxdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: auth_user
+    password: yash_saini
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  redis:
+    url: rediss://default:${REDIS_PASSWORD}@redis-12062.c264.ap-south-1-1.ec2.cloud.redislabs.com:12062
+    port: 6379
+    timeout: 2000ms
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:devDefaultSecretKeyMakeThisVeryLongAndSecure123!}
+  access-token-expiration-ms: 3600000
+  refresh-token-expiration-ms: 2592000000
+
+logging:
+  level:
+    com.portfolio.auth: DEBUG
