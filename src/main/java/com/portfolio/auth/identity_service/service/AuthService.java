@@ -72,11 +72,11 @@ public class AuthService {
         // 5) Post-save: create OTP and send verification asynchronously
         // OTP stored in Redis with TTL (e.g., 10 minutes)
         try {
+            System.out.println("🚀 Calling OTP service for: " + saved.getEmail());
             otpService.createAndQueueOtpForEmail(saved.getEmail());
         } catch (Exception e) {
-            // Do not leak sensitive info; decide strategy:
-            // Option: continue and allow resend; Option: throw to rollback. We'll log and continue.
-         //   log.error("Failed to queue OTP for email={} userId={}", saved.getEmail(), saved.getId(), e);
+            e.printStackTrace();  // show full email/redis errors
+            throw e;
         }
 
         // 6) Map to safe response
@@ -107,6 +107,25 @@ public class AuthService {
         user.setEnabled(true);
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void resendEmailOtp(String emailRaw) {
+
+        String email = emailRaw.trim().toLowerCase(Locale.ROOT);
+
+        // 1) Check user exists
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        // 2) (Optional) If already verified, don't resend
+        if (user.isEnabled()) {
+            throw new IllegalStateException("User is already verified. OTP resend not allowed.");
+        }
+
+        // 3) Re-create OTP and send it
+        System.out.println("🔁 Resending OTP for: " + email);
+        otpService.createAndQueueOtpForEmail(email);
     }
 
 

@@ -1,6 +1,7 @@
 package com.portfolio.auth.identity_service.controller;
 
 import com.portfolio.auth.identity_service.dto.RegisterRequest;
+import com.portfolio.auth.identity_service.dto.ResendOtpRequest;
 import com.portfolio.auth.identity_service.dto.UserResponse;
 import com.portfolio.auth.identity_service.dto.VerifyOtpRequest;
 import com.portfolio.auth.identity_service.service.AuthService;
@@ -34,5 +35,11 @@ public class AuthController {
     public ResponseEntity<String> verifyOtp(@RequestBody VerifyOtpRequest req) {
         authService.verifyEmailOtp(req.getEmail(), req.getOtpCode());
         return ResponseEntity.ok("Email verified successfully!");
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(@Valid @RequestBody ResendOtpRequest req) {
+        authService.resendEmailOtp(req.getEmail());
+        return ResponseEntity.ok("OTP resent successfully to " + req.getEmail());
     }
 }
