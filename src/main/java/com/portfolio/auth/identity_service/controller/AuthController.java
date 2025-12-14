@@ -1,9 +1,6 @@
 package com.portfolio.auth.identity_service.controller;
 
-import com.portfolio.auth.identity_service.dto.RegisterRequest;
-import com.portfolio.auth.identity_service.dto.ResendOtpRequest;
-import com.portfolio.auth.identity_service.dto.UserResponse;
-import com.portfolio.auth.identity_service.dto.VerifyOtpRequest;
+import com.portfolio.auth.identity_service.dto.*;
 import com.portfolio.auth.identity_service.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +38,13 @@ public class AuthController {
     public ResponseEntity<String> resendOtp(@Valid @RequestBody ResendOtpRequest req) {
         authService.resendEmailOtp(req.getEmail());
         return ResponseEntity.ok("OTP resent successfully to " + req.getEmail());
+    }
+
+    @PostMapping("/forgot-Password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req){
+        authService.forgotPassword(req.getEmail());
+        return ResponseEntity.ok(
+                "If the email is registered and verified, an OTP has been sent."
+        );
     }
 }

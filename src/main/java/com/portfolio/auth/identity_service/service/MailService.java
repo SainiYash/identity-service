@@ -7,6 +7,7 @@ import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,7 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    @Async
     public void sendOtpEmail(String toEmail, String otpCode) {
         String subject = "Your OTP Verification Code";
 

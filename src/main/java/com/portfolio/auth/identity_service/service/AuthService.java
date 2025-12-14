@@ -73,7 +73,10 @@ public class AuthService {
         // OTP stored in Redis with TTL (e.g., 10 minutes)
         try {
             System.out.println("🚀 Calling OTP service for: " + saved.getEmail());
-            otpService.createAndQueueOtpForEmail(saved.getEmail());
+            otpService.createAndQueueOtpForEmail(
+                    saved.getEmail(),
+                    OtpPurpose.REGISTER
+            );
         } catch (Exception e) {
             e.printStackTrace();  // show full email/redis errors
             throw e;
@@ -95,7 +98,11 @@ public class AuthService {
     @Transactional
     public void verifyEmailOtp(String email, String otpCode) {
 
-        boolean isValid = otpService.verifyOtp(email, otpCode);
+        boolean isValid = otpService.verifyOtp(
+                email,
+                otpCode,
+                OtpPurpose.REGISTER
+        );
 
         if (!isValid) {
             throw new InvalidOtpException("Invalid or expired OTP");
@@ -124,8 +131,25 @@ public class AuthService {
         }
 
         // 3) Re-create OTP and send it
-        System.out.println("🔁 Resending OTP for: " + email);
-        otpService.createAndQueueOtpForEmail(email);
+        System.out.println(" Resending OTP for: " + email);
+        otpService.createAndQueueOtpForEmail(
+                email,
+                OtpPurpose.REGISTER
+        );    }
+
+    @Transactional
+    public void forgotPassword(String emailRaw){
+
+        String email = emailRaw.trim().toLowerCase(Locale.ROOT);
+
+        userRepository.findByEmailIgnoreCase(email)
+                .filter(User::isEnabled)
+                .ifPresent(user ->
+                        otpService.createAndQueueOtpForEmail(
+                                email,
+                                OtpPurpose.FORGOT_PASSWORD
+                        )
+                );
     }
 
 
