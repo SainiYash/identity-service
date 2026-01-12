@@ -152,6 +152,19 @@ public class AuthService {
                 );
     }
 
+    public void verifyForgotPasswordOtp(String email, String otpCode) {
+
+        boolean ok = otpService.verifyOtp(email, otpCode, OtpPurpose.FORGOT_PASSWORD);
+
+        if (!ok) {
+            throw new RuntimeException("Invalid or expired OTP");
+        }
+
+        // ✅ THIS LINE goes here
+        otpService.markOtpVerified(email, OtpPurpose.FORGOT_PASSWORD);
+    }
+
+
 
 
 

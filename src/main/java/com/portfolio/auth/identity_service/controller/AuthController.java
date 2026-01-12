@@ -29,13 +29,13 @@ public class AuthController {
 
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(@RequestBody VerifyOtpRequest req) {
+    public ResponseEntity<String> verifyEmailOtp(@RequestBody VerifyOtpRequest req) {
         authService.verifyEmailOtp(req.getEmail(), req.getOtpCode());
         return ResponseEntity.ok("Email verified successfully!");
     }
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<String> resendOtp(@Valid @RequestBody ResendOtpRequest req) {
+    public ResponseEntity<String> resendEmailOtp(@Valid @RequestBody ResendOtpRequest req) {
         authService.resendEmailOtp(req.getEmail());
         return ResponseEntity.ok("OTP resent successfully to " + req.getEmail());
     }
@@ -47,4 +47,11 @@ public class AuthController {
                 "If the email is registered and verified, an OTP has been sent."
         );
     }
+
+    @PostMapping("/forgot-password/verify-otp")
+    public ResponseEntity<String> verifyForgotPasswordOtp(@Valid @RequestBody VerifyOtpRequest req) {
+        authService.verifyForgotPasswordOtp(req.getEmail(), req.getOtpCode());
+        return ResponseEntity.ok("OTP verified successfully. You can now reset your password.");
+    }
+
 }

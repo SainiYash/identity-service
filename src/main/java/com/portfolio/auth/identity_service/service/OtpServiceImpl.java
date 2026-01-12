@@ -61,6 +61,25 @@ public class OtpServiceImpl implements OtpService {
         return match;
     }
 
+    @Override
+    public void markOtpVerified(String email, OtpPurpose purpose) {
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+
+        String key = "otp_verified:" + purpose.name() + ":" + normalizedEmail;
+
+        redisTemplate.opsForValue().set(key, "true", 10, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public boolean isOtpVerified(String email, OtpPurpose purpose) {
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+
+        String key = "otp_verified:" + purpose.name() + ":" + normalizedEmail;
+
+        return "true".equals(redisTemplate.opsForValue().get(key));
+    }
+
+
     private String buildRedisKey(String email, OtpPurpose purpose) {
         return "otp:" + purpose.name() + ":" + email;
     }

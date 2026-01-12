@@ -8,4 +8,8 @@ public interface OtpService {
 
     // Step 2: Validate OTP from Redis
     boolean verifyOtp(String email, String otpCode, OtpPurpose purpose);
+
+    void markOtpVerified(String email, OtpPurpose purpose);
+
+    boolean isOtpVerified(String email, OtpPurpose purpose);
 }
