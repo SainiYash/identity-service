@@ -79,6 +79,14 @@ public class OtpServiceImpl implements OtpService {
         return "true".equals(redisTemplate.opsForValue().get(key));
     }
 
+    @Override
+    public void clearOtpVerified(String email, OtpPurpose purpose) {
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        String key = "otp_verified:" + purpose.name() + ":" + normalizedEmail;
+
+        redisTemplate.delete(key);
+    }
+
 
     private String buildRedisKey(String email, OtpPurpose purpose) {
         return "otp:" + purpose.name() + ":" + email;

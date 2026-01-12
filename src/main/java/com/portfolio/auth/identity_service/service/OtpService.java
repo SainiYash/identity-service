@@ -12,4 +12,7 @@ public interface OtpService {
     void markOtpVerified(String email, OtpPurpose purpose);
 
     boolean isOtpVerified(String email, OtpPurpose purpose);
+
+    void clearOtpVerified(String email, OtpPurpose purpose);
+
 }

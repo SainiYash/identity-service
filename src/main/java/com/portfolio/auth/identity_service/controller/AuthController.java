@@ -54,4 +54,10 @@ public class AuthController {
         return ResponseEntity.ok("OTP verified successfully. You can now reset your password.");
     }
 
+    @PostMapping("/forgot-password/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest req) {
+        authService.resetPassword(req);
+        return ResponseEntity.ok("Password reset successful.");
+    }
+
 }

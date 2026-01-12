@@ -10,6 +10,7 @@ package com.portfolio.auth.identity_service.service;
  */
 
 import com.portfolio.auth.identity_service.dto.RegisterRequest;
+import com.portfolio.auth.identity_service.dto.ResetPasswordRequest;
 import com.portfolio.auth.identity_service.dto.UserResponse;
 import com.portfolio.auth.identity_service.entity.User;
 import com.portfolio.auth.identity_service.exception.EmailAlreadyExistsException;
@@ -162,6 +163,39 @@ public class AuthService {
 
         // ✅ THIS LINE goes here
         otpService.markOtpVerified(email, OtpPurpose.FORGOT_PASSWORD);
+    }
+
+    public void resetPassword(ResetPasswordRequest req){
+
+        String email = req.getEmail().trim().toLowerCase();
+
+        //  1) Check email exists
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+
+        //  2) Check otp_verified flag (VERY IMPORTANT)
+        boolean verified = otpService.isOtpVerified(email, OtpPurpose.FORGOT_PASSWORD);
+        if (!verified) {
+            throw new RuntimeException("OTP not verified. Please verify OTP first.");
+        }
+
+        // 3) Validate passwords match
+        if (!req.getNewPassword().equals(req.getConfirmPassword())) {
+            throw new RuntimeException("New password and confirm password do not match");
+        }
+
+        // 4) Encode password
+        String encodedPassword = passwordEncoder.encode(req.getNewPassword());
+
+        // 5) Update password in DB
+        user.setPasswordHash(encodedPassword);
+        userRepository.save(user);
+
+        // 6) Delete Redis flags
+        otpService.clearOtpVerified(email, OtpPurpose.FORGOT_PASSWORD);
+
+
     }
 
 
