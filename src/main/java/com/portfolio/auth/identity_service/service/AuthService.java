@@ -9,9 +9,7 @@ package com.portfolio.auth.identity_service.service;
 
  */
 
-import com.portfolio.auth.identity_service.dto.RegisterRequest;
-import com.portfolio.auth.identity_service.dto.ResetPasswordRequest;
-import com.portfolio.auth.identity_service.dto.UserResponse;
+import com.portfolio.auth.identity_service.dto.*;
 import com.portfolio.auth.identity_service.entity.User;
 import com.portfolio.auth.identity_service.exception.EmailAlreadyExistsException;
 import com.portfolio.auth.identity_service.exception.InvalidOtpException;
@@ -32,22 +30,22 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;                  // encapsulates OTP generation + storage (Redis) + email send
-  //  private final JwtService jwtService;                  // encapsulates JWT creation & validation
+    private final JwtService jwtService;
   //  private final RefreshTokenService refreshTokenService; // handles refresh token storage/rotation in Redis
 
 
     @Transactional
-    public UserResponse register(RegisterRequest req){
+    public UserResponse register(RegisterRequest req) {
 
         // Normalize inputs
 
         String email = req.getEmail().trim().toLowerCase();
-        String name = req.getName().trim() ;
-        String number = req.getPhoneNumber()== null ? null : req.getPhoneNumber().trim();
+        String name = req.getName().trim();
+        String number = req.getPhoneNumber() == null ? null : req.getPhoneNumber().trim();
 
         // 1) Business validation: duplicate email
 
-        if(userRepository.existsByEmail(email)){
+        if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyExistsException("Email already registered: " + email);
         }
         // 2) Security: hash password
@@ -93,6 +91,50 @@ public class AuthService {
                 .role(saved.getRole().name())
                 .enabled(saved.isEnabled())
                 .createdAt(saved.getCreatedAt())
+                .build();
+    }
+
+    public LoginResponse login(LoginRequest request) {
+
+        User user = userRepository
+                .findByEmailIgnoreCase(
+                        request.getEmail()
+                )
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Invalid credentials"
+                        )
+                );
+
+        if (!user.isEnabled()) {
+            throw new RuntimeException(
+                    "Email not verified"
+            );
+        }
+
+        boolean matches =
+                passwordEncoder.matches(
+                        request.getPassword(),
+                        user.getPasswordHash()
+                );
+
+        if (!matches) {
+            throw new RuntimeException(
+                    "Invalid credentials"
+            );
+        }
+
+        user.setLastLogin(LocalDateTime.now());
+
+        userRepository.save(user);
+
+        String token =
+                jwtService.generateAccessToken(user);
+
+        return LoginResponse.builder()
+                .accessToken(token)
+                .role(user.getRole().name())
+                .email(user.getEmail())
                 .build();
     }
 
