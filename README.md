@@ -1,16 +1,12 @@
 # Identity Service
 
-> A production-ready authentication and authorization microservice built with Spring Boot.
+A production-ready authentication and authorization service built with Spring Boot, Spring Security, JWT, Redis, and MySQL, providing secure user authentication, email verification, password recovery, and role-based access control through RESTful APIs.
 
 ---
 
 ## Overview
 
-Identity Service is responsible for managing user authentication and authorization in a secure and scalable manner. It provides REST APIs for user registration, 
-email verification, login, password recovery, and JWT-based authentication. The service is designed to be integrated into larger applications or microservice 
-ecosystems as a centralized identity provider.
-
----
+Identity Service is a production-ready authentication and authorization backend that centralizes user identity management for modern applications. It provides secure REST APIs for user registration, email verification, JWT-based authentication, password recovery, and role-based authorization. Built using Spring Boot following layered architecture and REST best practices, the service is designed to integrate seamlessly with monolithic applications and microservice ecosystems.
 
 ---
 
@@ -52,7 +48,6 @@ ecosystems as a centralized identity provider.
 
 ## Project Structure
 
-```
 src
 ├── config
 ├── controller
@@ -63,7 +58,7 @@ src
 ├── security
 ├── service
 └── resources
-```
+
 
 The project follows a layered architecture to separate business logic, security, persistence, and API handling, making the codebase modular and maintainable.
 
@@ -71,7 +66,6 @@ The project follows a layered architecture to separate business logic, security,
 
 ## Authentication Workflow
 
-```text
 User
    │
    ▼
@@ -106,5 +100,24 @@ JWT Access Token Generated
    │
    ▼
 Access Protected APIs
-```
+
+---
+
+## REST API Endpoints
+
+ Live Demo 
+   
+   https://drive.google.com/file/d/1MoK7cclnTR5zL7w76hKkYVE0Me8jKBDx/view?usp=sharing
+
+| Method | Endpoint                                 | Description                        |
+| :----: | ---------------------------------------- | ---------------------------------- |
+|  POST  | /api/auth/register                       | Register a new user                |
+|  POST  | /api/auth/verify-otp                     | Verify email using OTP             |
+|  POST  | /api/auth/login                          | Authenticate user and generate JWT |
+|  POST  | /api/auth/forgot-password                | Generate password reset OTP        |
+|  POST  | /api/auth/forgot-password/verify-otp     | Verify password reset OTP          |
+|  POST  | /api/auth/forgot-password/reset-password | Reset user password                |
+
+---
+
 
